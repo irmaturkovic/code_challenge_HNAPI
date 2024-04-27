@@ -1,0 +1,12 @@
+C:\Users\irozajac\source\repos\HackerNewsAPI\HackerNewsAPI.Core\bin\Debug\net8.0\HackerNewsAPI.Core.deps.json
+C:\Users\irozajac\source\repos\HackerNewsAPI\HackerNewsAPI.Core\bin\Debug\net8.0\HackerNewsAPI.Core.dll
+C:\Users\irozajac\source\repos\HackerNewsAPI\HackerNewsAPI.Core\bin\Debug\net8.0\HackerNewsAPI.Core.pdb
+C:\Users\irozajac\source\repos\HackerNewsAPI\HackerNewsAPI.Core\obj\Debug\net8.0\HackerNewsAPI.Core.csproj.AssemblyReference.cache
+C:\Users\irozajac\source\repos\HackerNewsAPI\HackerNewsAPI.Core\obj\Debug\net8.0\HackerNewsAPI.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\irozajac\source\repos\HackerNewsAPI\HackerNewsAPI.Core\obj\Debug\net8.0\HackerNewsAPI.Core.AssemblyInfoInputs.cache
+C:\Users\irozajac\source\repos\HackerNewsAPI\HackerNewsAPI.Core\obj\Debug\net8.0\HackerNewsAPI.Core.AssemblyInfo.cs
+C:\Users\irozajac\source\repos\HackerNewsAPI\HackerNewsAPI.Core\obj\Debug\net8.0\HackerNewsAPI.Core.csproj.CoreCompileInputs.cache
+C:\Users\irozajac\source\repos\HackerNewsAPI\HackerNewsAPI.Core\obj\Debug\net8.0\HackerNewsAPI.Core.dll
+C:\Users\irozajac\source\repos\HackerNewsAPI\HackerNewsAPI.Core\obj\Debug\net8.0\refint\HackerNewsAPI.Core.dll
+C:\Users\irozajac\source\repos\HackerNewsAPI\HackerNewsAPI.Core\obj\Debug\net8.0\HackerNewsAPI.Core.pdb
+C:\Users\irozajac\source\repos\HackerNewsAPI\HackerNewsAPI.Core\obj\Debug\net8.0\ref\HackerNewsAPI.Core.dll
