@@ -7,15 +7,18 @@ namespace HackerNewsAPI.Core.Services
     public class HackerNewsService : IHackerNewsService
     {
         HttpClient client = new HttpClient();
-        private static Dictionary<int, Story> storyCache = new Dictionary<int, Story>();
 
         public HackerNewsService(IHttpClientFactory httpClientFactory)
         {
             client = httpClientFactory.CreateClient("HackerNewsAPI");
         }
-        public async Task<IEnumerable<Story>> GetNewestStoriesAsync()
+        public async Task<IEnumerable<Story>> GetStoriesByTypeAsync(string type)
         {
-            HttpResponseMessage response = await client.GetAsync("newstories.json");
+            //we would use pageSize and pageNumber params here 
+
+            //int startIndex = (pageNumber - 1) * pageSize;
+
+            HttpResponseMessage response = await client.GetAsync($"{type}.json");
 
             if (response.IsSuccessStatusCode)
             {
@@ -26,7 +29,18 @@ namespace HackerNewsAPI.Core.Services
                     PropertyNameCaseInsensitive = true
                 });
 
-                var stories = await FetchStoriesAsync(storyIds);
+                //var paginatedStoryIds = storyIds?.Skip(startIndex).Take(pageSize);
+                var stories = new List<Story>();
+
+                foreach (var id in storyIds)
+                {
+                    var story = await GetStoryById(id);
+
+                    if (story != null)
+                    {
+                        stories.Add(story);
+                    }
+                }
 
                 return stories;
             }
@@ -57,32 +71,5 @@ namespace HackerNewsAPI.Core.Services
             }
         }
 
-        private async Task<IEnumerable<Story>> FetchStoriesAsync(IEnumerable<int> storyIds)
-        {
-            var stories = new List<Story>();
-
-            foreach (var id in storyIds)
-            {
-                Story story;
-
-                if (storyCache.TryGetValue(id, out story))
-                {
-                    stories.Add(story); // Add cached story to the list
-                }
-                else
-                {
-                    // Fetch the story from the API
-                    story = await GetStoryById(id);
-
-                    // Cache the fetched story
-                    if (story != null)
-                    {
-                        storyCache[id] = story;
-                        stories.Add(story);
-                    }
-                }
-            }
-            return stories;
-        }
     }
 }

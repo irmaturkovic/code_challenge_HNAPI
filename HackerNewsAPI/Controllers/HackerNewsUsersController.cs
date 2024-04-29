@@ -21,23 +21,5 @@ namespace HackerNewsAPI.Controllers
         {
             return "value";
         }
-
-        // POST api/<HackerNewsUsersController>
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
-
-        // PUT api/<HackerNewsUsersController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/<HackerNewsUsersController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
     }
 }
