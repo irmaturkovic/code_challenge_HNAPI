@@ -1,0 +1,19 @@
+.story-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 3rem 1rem;
+
+    &__title-block {
+        margin-bottom: 3rem;
+        font-size: 30px;
+    }
+
+    &__search-block {
+        .search-input {
+            min-width: 250px;
+        }
+    }
+
+    &__table-block {}
+}
