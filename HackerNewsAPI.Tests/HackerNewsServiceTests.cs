@@ -4,6 +4,7 @@ using HackerNewsAPI.Core.Services;
 using Moq;
 using Moq.Protected;
 using System.Net;
+using System.Net.Http;
 using System.Text.Json;
 
 namespace HackerNewsAPI.Tests
@@ -58,6 +59,35 @@ namespace HackerNewsAPI.Tests
             Assert.Equals(expectedStory.Kids, result.Kids);
             Assert.Equals(expectedStory.Score, result.Score);
             Assert.Equals(expectedStory.Url, result.Url);
+        }
+
+        [Test]
+        public void GetStoryById_Failure_ThrowsException()
+        {
+            // Arrange
+            int storyId = 1;
+            var mockHttpClientFactory = new Mock<IHttpClientFactory>();
+            var mockHttpClient = new Mock<IHttpClientFactory>();
+            var mockHttpMessageHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+
+            mockHttpMessageHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.NotFound));
+
+            // Act & Assert
+
+            var httpClient = new HttpClient(mockHttpMessageHandler.Object)
+            {
+                BaseAddress = new Uri($"https://hacker-news.firebaseio.com/v0/item/{storyId}.json"),
+            };
+            mockHttpClientFactory
+                .Setup(factory => factory.CreateClient("HackerNewsAPI"))
+                .Returns(httpClient);
+
+            var hackerNewestService = new HackerNewsService(mockHttpClientFactory.Object);
+
+            // Act
+            Assert.ThrowsAsync<Exception>(() => hackerNewestService.GetStoryById(storyId));
         }
     }
 }
