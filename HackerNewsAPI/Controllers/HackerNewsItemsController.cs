@@ -47,6 +47,7 @@ namespace HackerNewsAPI.Controllers
 
         // GET api/HackerNewsItems
         [HttpGet]
+        [ResponseCache(Duration = 60)]
         public async Task<IActionResult> GetNewestStories([FromQuery] string type/*, int pageSize, int pageNumber*/)
         {
             try
