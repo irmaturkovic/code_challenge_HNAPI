@@ -5,17 +5,28 @@ using Moq;
 using Moq.Protected;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Text.Json;
 
 namespace HackerNewsAPI.Tests
 {
     public class HackerNewsServiceTests
     {
+        private IHackerNewsService _hackerNewsService;
+        private Mock<IHttpClientFactory> _mockHttpClientFactory;
+
+        [SetUp]
+        public void Setup()
+        {
+            _mockHttpClientFactory = new Mock<IHttpClientFactory>();
+            //_hackerNewsService = new HackerNewsService(_mockHttpClientFactory.Object);
+        }
+
         [Test]
-        public async Task GetStoryById_Success_ReturnsStory()
+        public async Task GetStoryById_Returns_Story_When_Response_Is_Successful()
         {
             // Arrange
-            int id = 8863;
+            int storyId = 8863;
             var expectedStory = new Story
             {
                 By = "dhouston",
@@ -30,64 +41,54 @@ namespace HackerNewsAPI.Tests
 
             var jsonString = JsonSerializer.Serialize(expectedStory);
 
-            var mockHttpClientFactory = new Mock<IHttpClientFactory>();
-            var mockHttpClient = new Mock<IHttpClientFactory>();
             var mockHttpMessageHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
             mockHttpMessageHandler.Protected()
-                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
-                .ReturnsAsync(new HttpResponseMessage
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent(jsonString),
-                });
+                                  .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+                                  .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(jsonString, Encoding.UTF8, "application/json") });
 
             var httpClient = new HttpClient(mockHttpMessageHandler.Object)
             {
-                BaseAddress = new Uri($"https://hacker-news.firebaseio.com/v0/item/{id}.json"),
+                BaseAddress = new Uri($"https://hacker-news.firebaseio.com/v0/item/{storyId}.json")
             };
-            mockHttpClientFactory
-                .Setup(factory => factory.CreateClient("HackerNewsAPI"))
-                .Returns(httpClient);
 
-            var hackerNewestService = new HackerNewsService(mockHttpClientFactory.Object);
+            _mockHttpClientFactory.Setup(factory => factory.CreateClient("HackerNewsAPI"))
+                                  .Returns(httpClient);
+
+            _hackerNewsService = new HackerNewsService(_mockHttpClientFactory.Object);
 
             // Act
-            var result = await hackerNewestService.GetStoryById(id);
+            var result = await _hackerNewsService.GetStoryById(storyId);
 
             // Assert
-            Assert.NotNull(result);
-            Assert.Equals(expectedStory.Kids, result.Kids);
-            Assert.Equals(expectedStory.Score, result.Score);
-            Assert.Equals(expectedStory.Url, result.Url);
+            Assert.IsNotNull(result);
+            Assert.AreEqual(expectedStory.By, result.By);
+            Assert.AreEqual(expectedStory.Title, result.Title);
         }
 
         [Test]
-        public void GetStoryById_Failure_ThrowsException()
+        public void GetStoryById_Throws_Exception_When_Response_Is_Not_Successful()
         {
             // Arrange
-            int storyId = 1;
-            var mockHttpClientFactory = new Mock<IHttpClientFactory>();
-            var mockHttpClient = new Mock<IHttpClientFactory>();
+            int storyId = 0;
+
             var mockHttpMessageHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
-
             mockHttpMessageHandler.Protected()
-                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
-                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.NotFound));
-
-            // Act & Assert
+                                  .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+                                  .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.InternalServerError));
 
             var httpClient = new HttpClient(mockHttpMessageHandler.Object)
             {
-                BaseAddress = new Uri($"https://hacker-news.firebaseio.com/v0/item/{storyId}.json"),
+                BaseAddress = new Uri($"https://hacker-news.firebaseio.com/v0/item/{storyId}.json")
             };
-            mockHttpClientFactory
-                .Setup(factory => factory.CreateClient("HackerNewsAPI"))
-                .Returns(httpClient);
 
-            var hackerNewestService = new HackerNewsService(mockHttpClientFactory.Object);
+            _mockHttpClientFactory.Setup(factory => factory.CreateClient("HackerNewsAPI"))
+                                  .Returns(httpClient);
 
-            // Act
-            Assert.ThrowsAsync<Exception>(() => hackerNewestService.GetStoryById(storyId));
+            _hackerNewsService = new HackerNewsService(_mockHttpClientFactory.Object);
+
+            // Act & Assert
+            Assert.ThrowsAsync<Exception>(() => _hackerNewsService.GetStoryById(storyId));
         }
+
     }
 }

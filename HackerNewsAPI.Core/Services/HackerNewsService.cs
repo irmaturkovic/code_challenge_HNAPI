@@ -15,7 +15,6 @@ namespace HackerNewsAPI.Core.Services
         public async Task<IEnumerable<Story>> GetStoriesByTypeAsync(string type)
         {
             //we would use pageSize and pageNumber params here 
-
             //int startIndex = (pageNumber - 1) * pageSize;
 
             HttpResponseMessage response = await client.GetAsync($"{type}.json");
@@ -23,26 +22,17 @@ namespace HackerNewsAPI.Core.Services
             if (response.IsSuccessStatusCode)
             {
                 string jsonString = await response.Content.ReadAsStringAsync();
-
                 var storyIds = JsonSerializer.Deserialize<IEnumerable<int>>(jsonString, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
                 });
 
                 //var paginatedStoryIds = storyIds?.Skip(startIndex).Take(pageSize);
-                var stories = new List<Story>();
 
-                foreach (var id in storyIds)
-                {
-                    var story = await GetStoryById(id);
+                var tasks = storyIds?.Select(id => GetStoryById(id)).ToList();
+                var stories = await Task.WhenAll(tasks);
 
-                    if (story != null)
-                    {
-                        stories.Add(story);
-                    }
-                }
-
-                return stories;
+                return stories.Where(story => story != null);
             }
             else
             {
@@ -70,6 +60,5 @@ namespace HackerNewsAPI.Core.Services
                 throw new Exception($"Failed to fetch story with id {id}.");
             }
         }
-
     }
 }
